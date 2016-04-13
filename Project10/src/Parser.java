@@ -28,15 +28,15 @@ public class Parser {
 				}
 			}
 		}
-		if (tokenList.get(counter).equals("}")){
+		if (tokenList.get(counter).equals("}")) {
 			return;
-		}
-		else
+		} else
 			System.exit(-1);
 	}
 
 	public void parseClassVarDec() {
-		while (tokenList.get(counter).equals("field")||tokenList.get(counter).equals("static")) {
+		while (tokenList.get(counter).equals("field")
+				|| tokenList.get(counter).equals("static")) {
 			counter++;
 			if (tokenList.get(counter).equals("int")
 					|| tokenList.get(counter).equals("char")
@@ -81,6 +81,7 @@ public class Parser {
 						counter++;
 						if (tokenList.get(counter).equals("{")) {
 							counter++;
+							parseVarDec();
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
 								return;
@@ -90,6 +91,7 @@ public class Parser {
 				}
 			}
 		} else if (tokenList.get(counter).equals("method")) {
+			counter++;
 			if (tokenList.get(counter).equals("void")
 					|| tokenList.get(counter).equals("int")
 					|| tokenList.get(counter).equals("char")
@@ -106,6 +108,7 @@ public class Parser {
 						counter++;
 						if (tokenList.get(counter).equals("{")) {
 							counter++;
+							parseVarDec();
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
 								return;
@@ -163,7 +166,7 @@ public class Parser {
 					return;
 			}
 		}
-		System.exit(-1);
+		return;
 	}
 
 	public void parseVarDec() {
@@ -233,30 +236,17 @@ public class Parser {
 	public void parseDo() {
 		parseExpression();
 		return;
-		/*if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
-			counter++;
-			while (tokenList.get(counter).equals(".")
-					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
-				counter++;
-			}
-			if (tokenList.get(counter).equals("(")) {
-				counter++;
-				if (typeList.get(counter).equals(tokenType.INT_CONST)
-						|| typeList.get(counter).equals(tokenType.STRING_CONST)) {
-					counter++;
-					//parseTerm();
-				} else {
-					counter++;
-					parseExpressionList();
-				}
-				if (tokenList.get(counter).equals(")")) {
-					counter++;
-					if (tokenList.get(counter).equals(";")) {
-						return;
-					}
-				}
-			}
-		}*/
+		/*
+		 * if (typeList.get(counter).equals(tokenType.IDENTIFIER)) { counter++;
+		 * while (tokenList.get(counter).equals(".") ||
+		 * typeList.get(counter).equals(tokenType.IDENTIFIER)) { counter++; } if
+		 * (tokenList.get(counter).equals("(")) { counter++; if
+		 * (typeList.get(counter).equals(tokenType.INT_CONST) ||
+		 * typeList.get(counter).equals(tokenType.STRING_CONST)) { counter++;
+		 * //parseTerm(); } else { counter++; parseExpressionList(); } if
+		 * (tokenList.get(counter).equals(")")) { counter++; if
+		 * (tokenList.get(counter).equals(";")) { return; } } } }
+		 */
 	}
 
 	public void parseLet() {
@@ -292,37 +282,22 @@ public class Parser {
 				counter++;
 				parseExpression();
 				return;
-				/*if (typeList.get(counter).equals(tokenType.INT_CONST)) {
-					counter++;
-					if (tokenList.get(counter).equals(";")) {
-						return;
-					}
-				} else if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
-					counter++;
-					while (tokenList.get(counter).equals(".")
-							|| typeList.get(counter).equals(
-									tokenType.IDENTIFIER)) {
-						counter++;
-					}
-					if (tokenList.get(counter).equals("(")) {
-						counter++;
-						if (typeList.get(counter).equals(tokenType.INT_CONST)
-								|| typeList.get(counter).equals(
-										tokenType.STRING_CONST)) {
-							counter++;
-							// parseTerm();
-						} else {
-							counter++;
-							parseExpressionList();
-						}
-						if (tokenList.get(counter).equals(")")) {
-							counter++;
-							if (tokenList.get(counter).equals(";")) {
-								return;
-							}
-						}
-					}
-				}*/
+				/*
+				 * if (typeList.get(counter).equals(tokenType.INT_CONST)) {
+				 * counter++; if (tokenList.get(counter).equals(";")) { return;
+				 * } } else if
+				 * (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+				 * counter++; while (tokenList.get(counter).equals(".") ||
+				 * typeList.get(counter).equals( tokenType.IDENTIFIER)) {
+				 * counter++; } if (tokenList.get(counter).equals("(")) {
+				 * counter++; if
+				 * (typeList.get(counter).equals(tokenType.INT_CONST) ||
+				 * typeList.get(counter).equals( tokenType.STRING_CONST)) {
+				 * counter++; // parseTerm(); } else { counter++;
+				 * parseExpressionList(); } if
+				 * (tokenList.get(counter).equals(")")) { counter++; if
+				 * (tokenList.get(counter).equals(";")) { return; } } } }
+				 */
 			}
 		}
 		System.exit(-1);
@@ -364,6 +339,21 @@ public class Parser {
 			parseExpression();
 			if (tokenList.get(counter).equals(")")) {
 				counter++;
+				if (tokenList.get(counter).equals("&")
+						|| tokenList.get(counter).equals("|")
+						|| tokenList.get(counter).equals("<")
+						|| tokenList.get(counter).equals(">")
+						|| tokenList.get(counter).equals("+")
+						|| tokenList.get(counter).equals("-")
+						|| tokenList.get(counter).equals("*")
+						|| tokenList.get(counter).equals("/")
+						|| tokenList.get(counter).equals("=")) {
+					parseExpression();
+					counter++;
+				}
+				if (tokenList.get(counter).equals(")")) {
+					counter++;
+				}
 				if (tokenList.get(counter).equals("{")) {
 					counter++;
 					if (!tokenList.get(counter).equals("}")) {
@@ -373,13 +363,17 @@ public class Parser {
 				}
 			}
 		}
-		System.exit(-1);
+
+		return;
 	}
 
 	public void parseExpression() {
-		while (!tokenList.get(counter).equals(")")&&!tokenList.get(counter).equals("]")&&!tokenList.get(counter).equals(";")) {
+		while (!tokenList.get(counter).equals(")")
+				&& !tokenList.get(counter).equals("]")
+				&& !tokenList.get(counter).equals(";")) {
 			counter++;
-			if (tokenList.get(counter).equals("(")||tokenList.get(counter).equals("[")) {
+			if (tokenList.get(counter).equals("(")
+					|| tokenList.get(counter).equals("[")) {
 				parseExpression();
 				counter++;
 			}
