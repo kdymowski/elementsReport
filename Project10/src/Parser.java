@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 
-
-
 public class Parser {
 	public static ArrayList<String> tokenList = new ArrayList<String>();
 	public static ArrayList<tokenType> typeList = new ArrayList<tokenType>();
@@ -11,35 +9,34 @@ public class Parser {
 	public Parser(ArrayList<String> tokenList, ArrayList<tokenType> typeList) {
 		this.tokenList = tokenList;
 		this.typeList = typeList;
-
 	}
 
-	public boolean parseClass() {
+	public void parseClass() {
 		if (tokenList.get(counter).equals("class")) {
 			counter++;
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
 				if (tokenList.get(counter).equals("{")) {
 					counter++;
-					return parseClassVarDec();
-
+					parseClassVarDec();
+					while (tokenList.get(counter).equals("constructor")
+							|| tokenList.get(counter).equals("method")
+							|| tokenList.get(counter).equals("function")) {
+						parseSubroutine();
+						counter++;
+					}
 				}
-
 			}
-
 		}
-		return false;
-
+		if (tokenList.get(counter).equals("}")){
+			return;
+		}
+		else
+			System.exit(-1);
 	}
 
-	public boolean parseClassVarDec() {
-		if (tokenList.get(counter).equals("constructor")
-				|| tokenList.get(counter).equals("method")
-				|| tokenList.get(counter).equals("function")) {
-			return parseSubroutine();
-
-		}
-		if (tokenList.get(counter).equals("field")) {
+	public void parseClassVarDec() {
+		while (tokenList.get(counter).equals("field")||tokenList.get(counter).equals("static")) {
 			counter++;
 			if (tokenList.get(counter).equals("int")
 					|| tokenList.get(counter).equals("char")
@@ -54,30 +51,22 @@ public class Parser {
 								|| typeList.get(counter).equals(
 										tokenType.IDENTIFIER)) {
 							counter++;
-
 						}
 						if (tokenList.get(counter).equals(";")) {
 							counter++;
-							return parseClassVarDec();
-
+							parseClassVarDec();
 						}
-
 					} else if (tokenList.get(counter).equals(";")) {
 						counter++;
-						return parseClassVarDec();
-
+						parseClassVarDec();
 					}
-
 				}
-
 			}
-
 		}
-		return false;
-
+		return;
 	}
 
-	public boolean parseSubroutine() {
+	public void parseSubroutine() {
 		if (tokenList.get(counter).equals("constructor")) {
 			counter++;
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
@@ -87,7 +76,6 @@ public class Parser {
 					if (tokenList.get(counter).equals("(")) {
 						counter++;
 						parseParameterList();
-
 					}
 					if (tokenList.get(counter).equals(")")) {
 						counter++;
@@ -95,18 +83,12 @@ public class Parser {
 							counter++;
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
-								return true;
-
+								return;
 							}
-
 						}
-
 					}
-
 				}
-
 			}
-
 		} else if (tokenList.get(counter).equals("method")) {
 			if (tokenList.get(counter).equals("void")
 					|| tokenList.get(counter).equals("int")
@@ -119,7 +101,6 @@ public class Parser {
 					if (tokenList.get(counter).equals("(")) {
 						counter++;
 						parseParameterList(); // Might not need
-
 					}
 					if (tokenList.get(counter).equals(")")) {
 						counter++;
@@ -127,60 +108,46 @@ public class Parser {
 							counter++;
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
-								return true;
-
+								return;
 							}
-
 						}
-
 					}
-
 				}
-
-			} else if (tokenList.get(counter).equals("function")) {
-				if (tokenList.get(counter).equals("void")
-						|| tokenList.get(counter).equals("int")
-						|| tokenList.get(counter).equals("char")
-						|| tokenList.get(counter).equals("boolean")
-						|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
-					counter++;
-					if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
-						counter++;
-						if (tokenList.get(counter).equals("(")) {
-							counter++;
-							parseParameterList(); // Might not need
-
-						}
-						if (tokenList.get(counter).equals(")")) {
-							counter++;
-							if (tokenList.get(counter).equals("{")) {
-								counter++;
-								parseVarDec(); // !
-								parseStatements();
-								if (tokenList.get(counter).equals("}")) {
-									return true;
-
-								}
-
-							}
-
-						}
-
-					}
-
-				}
-
 			}
-
+		} else if (tokenList.get(counter).equals("function")) {
+			counter++;
+			if (tokenList.get(counter).equals("void")
+					|| tokenList.get(counter).equals("int")
+					|| tokenList.get(counter).equals("char")
+					|| tokenList.get(counter).equals("boolean")
+					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+				counter++;
+				if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+					counter++;
+					if (tokenList.get(counter).equals("(")) {
+						counter++;
+						parseParameterList(); // Might not need
+					}
+					if (tokenList.get(counter).equals(")")) {
+						counter++;
+						if (tokenList.get(counter).equals("{")) {
+							counter++;
+							parseVarDec(); // !
+							parseStatements();
+							if (tokenList.get(counter).equals("}")) {
+								return;
+							}
+						}
+					}
+				}
+			}
 		}
-		return false;
-
+		System.exit(-1);
 	}
 
-	public boolean parseParameterList() {
+	public void parseParameterList() {
 		if (tokenList.get(counter).equals(")")) {
-			return true;
-
+			return;
 		}
 		if (tokenList.get(counter).equals("int")
 				|| tokenList.get(counter).equals("char")
@@ -192,18 +159,14 @@ public class Parser {
 				if (tokenList.get(counter).equals(",")) {
 					counter++;
 					parseParameterList();
-
 				} else
-					return true;
-
+					return;
 			}
-
 		}
-		return false;
-
+		System.exit(-1);
 	}
 
-	public boolean parseVarDec() {
+	public void parseVarDec() {
 		if (tokenList.get(counter).equals("var")) {
 			counter++;
 			if (tokenList.get(counter).equals("int")
@@ -219,172 +182,127 @@ public class Parser {
 								|| typeList.get(counter).equals(
 										tokenType.IDENTIFIER)) {
 							counter++;
-
 						}
 						if (tokenList.get(counter).equals(";")) {
 							counter++;
-							return parseVarDec();
-
+							parseVarDec();
 						}
-
 					} else if (tokenList.get(counter).equals(";")) {
 						counter++;
-						return parseVarDec();
-
+						parseVarDec();
 					}
-
 				}
-
 			}
-
 		}
-		return false;
-
+		return;
 	}
 
-	public boolean parseStatements() {
+	public void parseStatements() {
 		if (tokenList.get(counter).equals("}")) {
-			return true;
-
+			return;
 		}
 		if (tokenList.get(counter).equals("do")) {
 			counter++;
 			parseDo();
-
+			counter++;
+			parseStatements();
 		} else if (tokenList.get(counter).equals("let")) {
 			counter++;
 			parseLet();
-
+			counter++;
+			parseStatements();
 		} else if (tokenList.get(counter).equals("while")) {
 			counter++;
 			parseWhile();
-
+			counter++;
+			parseStatements();
 		} else if (tokenList.get(counter).equals("return")) {
 			counter++;
 			parseReturn();
-
+			counter++;
+			parseStatements();
 		} else if (tokenList.get(counter).equals("if")) {
 			counter++;
 			parseIf();
-
+			counter++;
+			parseStatements();
 		}
-		return false;
-
+		return;
 	}
 
-	public boolean parseDo() {
-		if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+	public void parseDo() {
+		parseExpression();
+		return;
+		/*if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 			counter++;
 			while (tokenList.get(counter).equals(".")
 					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
-
 			}
 			if (tokenList.get(counter).equals("(")) {
 				counter++;
 				if (typeList.get(counter).equals(tokenType.INT_CONST)
 						|| typeList.get(counter).equals(tokenType.STRING_CONST)) {
 					counter++;
-					parseTerm();
-
+					//parseTerm();
 				} else {
 					counter++;
 					parseExpressionList();
-
 				}
 				if (tokenList.get(counter).equals(")")) {
 					counter++;
 					if (tokenList.get(counter).equals(";")) {
-						return true;
-
+						return;
 					}
-
 				}
-
 			}
-
-		}
-		return false;
-
+		}*/
 	}
 
-	public boolean parseLet() {
+	public void parseLet() {
 		if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 			counter++;
 			if (tokenList.get(counter).equals("[")) {
 				counter++;
-				if (typeList.get(counter).equals(tokenType.IDENTIFIER)
-						|| typeList.get(counter).equals(tokenType.INT_CONST)) {
+				parseExpression();
+				if (tokenList.get(counter).equals("]")) {
 					counter++;
-					if (tokenList.get(counter).equals("]")) {
-						if (tokenList.get(counter).equals("=")) {
-							counter++;
-							if (typeList.get(counter).equals(
-									tokenType.INT_CONST)) {
-								counter++;
-								if (tokenList.get(counter).equals(";")) {
-									return true;
-
-								}
-
-							} else if (typeList.get(counter).equals(
-									tokenType.IDENTIFIER)) {
-								counter++;
-								while (tokenList.get(counter).equals(".")
-										|| typeList.get(counter).equals(
-												tokenType.IDENTIFIER)) {
-									counter++;
-
-								}
-								if (tokenList.get(counter).equals("(")) {
-									counter++;
-									if (typeList.get(counter).equals(
-											tokenType.INT_CONST)
-											|| typeList.get(counter).equals(
-													tokenType.STRING_CONST)) {
-										counter++;
-										parseTerm();
-
-									} else {
-										counter++;
-										parseExpressionList();
-
-									}
-									if (tokenList.get(counter).equals(")")) {
-										counter++;
-										if (tokenList.get(counter).equals(";")) {
-											return true;
-
-										}
-
-									}
-
-								}
-
-							}
-
-						}
-
-					}
-
 				}
-
-			} else if (tokenList.get(counter).equals("=")) {
+				/*
+				 * if (typeList.get(counter).equals(tokenType.IDENTIFIER) ||
+				 * typeList.get(counter).equals(tokenType.INT_CONST)) {
+				 * counter++; if (tokenList.get(counter).equals("]")) { if
+				 * (tokenList.get(counter).equals("=")) { counter++; if
+				 * (typeList.get(counter).equals( tokenType.INT_CONST)) {
+				 * counter++; if (tokenList.get(counter).equals(";")) { return;
+				 * } } else if (typeList.get(counter).equals(
+				 * tokenType.IDENTIFIER)) { counter++; while
+				 * (tokenList.get(counter).equals(".") ||
+				 * typeList.get(counter).equals( tokenType.IDENTIFIER)) {
+				 * counter++; } if (tokenList.get(counter).equals("(")) {
+				 * counter++; if (typeList.get(counter).equals(
+				 * tokenType.INT_CONST) || typeList.get(counter).equals(
+				 * tokenType.STRING_CONST)) { counter++; parseTerm(); } else {
+				 * counter++; parseExpressionList(); } if
+				 * (tokenList.get(counter).equals(")")) { counter++; if
+				 * (tokenList.get(counter).equals(";")) { return; } } } } } } }
+				 */
+			}
+			if (tokenList.get(counter).equals("=")) {
 				counter++;
-				if (typeList.get(counter).equals(tokenType.INT_CONST)) {
+				parseExpression();
+				return;
+				/*if (typeList.get(counter).equals(tokenType.INT_CONST)) {
 					counter++;
 					if (tokenList.get(counter).equals(";")) {
-						return true;
-
+						return;
 					}
-
 				} else if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 					counter++;
 					while (tokenList.get(counter).equals(".")
 							|| typeList.get(counter).equals(
 									tokenType.IDENTIFIER)) {
 						counter++;
-
 					}
 					if (tokenList.get(counter).equals("(")) {
 						counter++;
@@ -392,34 +310,25 @@ public class Parser {
 								|| typeList.get(counter).equals(
 										tokenType.STRING_CONST)) {
 							counter++;
-							parseTerm();
-
+							// parseTerm();
 						} else {
 							counter++;
 							parseExpressionList();
-
 						}
 						if (tokenList.get(counter).equals(")")) {
 							counter++;
 							if (tokenList.get(counter).equals(";")) {
-								return true;
-
+								return;
 							}
-
 						}
-
 					}
-
-				}
-
+				}*/
 			}
-
 		}
-		return false;
-
+		System.exit(-1);
 	}
 
-	public boolean parseWhile() {
+	public void parseWhile() {
 		if (tokenList.get(counter).equals("(")) {
 			counter++;
 			parseExpression();
@@ -429,30 +338,27 @@ public class Parser {
 					counter++;
 					if (!tokenList.get(counter).equals("}")) {
 						parseStatements();
-
 					} else
-						return true;
-
+						return;
 				}
-
 			}
-
 		}
-		return false;
-
+		return;
 	}
 
-	public boolean parseReturn() {
-		parseTerm();
+	public void parseReturn() {
+		// parseTerm();
 		if (tokenList.get(counter).equals(";")) {
-			return true;
-
+			return;
+		} else
+			parseExpression();
+		if (tokenList.get(counter).equals(";")) {
+			return;
 		}
-		return false;
-
+		System.exit(-1);
 	}
 
-	public boolean parseIf() {
+	public void parseIf() {
 		if (tokenList.get(counter).equals("(")) {
 			counter++;
 			parseExpression();
@@ -462,47 +368,42 @@ public class Parser {
 					counter++;
 					if (!tokenList.get(counter).equals("}")) {
 						parseStatements();
-
 					} else
-						return true;
-
+						return;
 				}
-
 			}
-
 		}
-		return false;
-
+		System.exit(-1);
 	}
 
-	public boolean parseExpression() {
-		return false;
-
+	public void parseExpression() {
+		while (!tokenList.get(counter).equals(")")&&!tokenList.get(counter).equals("]")&&!tokenList.get(counter).equals(";")) {
+			counter++;
+			if (tokenList.get(counter).equals("(")||tokenList.get(counter).equals("[")) {
+				parseExpression();
+				counter++;
+			}
+		}
+		return;
 	}
 
-	public boolean parseTerm() {
+	public void parseTerm() {
 
-		return false;
-
+		System.exit(-1);
 	}
 
-	public boolean parseExpressionList() {
+	public void parseExpressionList() {
 		while (!tokenList.get(counter).equals(")")) {
 			parseExpression();
 			counter++;
 			if (tokenList.get(counter).equals(",")) {
 				counter++;
-
 			}
-
 		}
-		return false;
-
+		return;
 	}
 
 	public void runner() {
 		parseClass();
-
 	}
-
 }

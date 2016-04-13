@@ -4,12 +4,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.regex.*;
 
 public class Tokenizer {
 	public static ArrayList<String> inputList = new ArrayList<String>();
 	public static ArrayList<String> tokenList = new ArrayList<String>();
+	public static ArrayList<tokenType> typeList = new ArrayList<tokenType>();
+	public static ArrayList<String> keywordList = new ArrayList<String>(
+			Arrays.asList("class", "constructor", "function", "method",
+					"field", "static", "var", "char", "int", "boolean", "void",
+					"true", "false", "null", "this", "let", "do", "if", "else",
+					"while", "return"));
+	public static ArrayList<String> symbolList = new ArrayList<String>(
+			Arrays.asList("{", "}", "(", ")", "[", "]", ".", ",", ";", "+",
+					"-", "*", "/", "&", "|", "<", ">", "=", "~"));
 	public static PrintStream writer;
 
 	public static void main(String[] args) throws IOException {
@@ -22,17 +32,24 @@ public class Tokenizer {
 		System.out.println(inputList.toString());
 		initSplitter();
 		System.out.println(tokenList.toString());
-		
+		System.out.println(typeList.toString());
+		System.out.println(tokenList.size());
+		System.out.println(typeList.size());
 		try {
 			writer = new PrintStream("out.txt");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		for (String s: tokenList){
-			writer.println(s);
+		for (int i = 0; i < tokenList.size(); i++) {
+			writer.print(typeList.get(i) + " ");
+			writer.println(tokenList.get(i));
 		}
 		writer.close();
+		
+		Parser p = new Parser(tokenList, typeList);
+		p.runner();
+		System.out.println("Finish");
 	}
 
 	public static void initScanner() throws FileNotFoundException {
@@ -53,27 +70,36 @@ public class Tokenizer {
 
 	public static void initSplitter() {
 		String crap = "";
-		for(String s : inputList){
+		for (String s : inputList) {
 			crap += s + " ";
 		}
-		while(!crap.isEmpty()){
+		while (!crap.isEmpty()) {
 			crap = crap.trim();
-			String expr = "([A-Za-z0-9]+)|((\\{)|(\\})|(\\()|(\\))|(\\[)|(\\])|(\\.)|(\\,)|(\\;)|(\\:)|(\\+)|(\\-)|(\\*)|(\\/)|(\\&)|(\\<)|(\\>)|(\\=)|(\\~))";
+			String expr = "([A-Za-z0-9]+)|((\\{)|(\\})|(\\()|(\\))|(\\[)|(\\])|(\\.)|(\\,)|(\\;)|(\\|)|(\\+)|(\\-)|(\\*)|(\\/)|(\\&)|(\\<)|(\\>)|(\\=)|(\\~))";
 			Pattern p = Pattern.compile(expr);
 			Matcher m = p.matcher(crap);
 			if (m.lookingAt()) {
 				String test = m.group();
 				tokenList.add(test);
+				if (keywordList.contains(test))
+					typeList.add(tokenType.KEYWORD);
+				else if (symbolList.contains(test))
+					typeList.add(tokenType.SYMBOL);
+				else if (Character.isDigit(test.charAt(0)))
+					typeList.add(tokenType.INT_CONST);
+				else
+					typeList.add(tokenType.IDENTIFIER);
 				crap = crap.substring(test.length());
-				//crap = crap.replace(test, "");
-			}else{
+				// crap = crap.replace(test, "");
+			} else {
 				crap = crap.substring(1);
 				String str = "";
 				int count = 0;
-				while(crap.charAt(count) != '"'){
+				while (crap.charAt(count) != '"') {
 					str += crap.charAt(count);
 					count++;
 				}
+				typeList.add(tokenType.STRING_CONST);
 				tokenList.add(str);
 				crap = crap.substring(count + 1);
 			}

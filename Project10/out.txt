@@ -1,140 +1,140 @@
-class
-Main
-{
-function
-void
-main
-(
-)
-{
-var
-Array
-a
-;
-var
-int
-length
-;
-var
-int
-i
-,
-sum
-;
-let
-length
-=
-Keyboard
-.
-readInt
-(
-HOW MANY NUMBERS? 
-)
-;
-let
-a
-=
-Array
-.
-new
-(
-length
-)
-;
-let
-i
-=
-0
-;
-while
-(
-i
-<
-length
-)
-{
-let
-a
-[
-i
-]
-=
-Keyboard
-.
-readInt
-(
-ENTER THE NEXT NUMBER: 
-)
-;
-let
-i
-=
-i
-+
-1
-;
-}
-let
-i
-=
-0
-;
-let
-sum
-=
-0
-;
-while
-(
-i
-<
-length
-)
-{
-let
-sum
-=
-sum
-+
-a
-[
-i
-]
-;
-let
-i
-=
-i
-+
-1
-;
-}
-do
-Output
-.
-printString
-(
-THE AVERAGE IS: 
-)
-;
-do
-Output
-.
-printInt
-(
-sum
-/
-length
-)
-;
-do
-Output
-.
-println
-(
-)
-;
-return
-;
-}
-}
+KEYWORD class
+IDENTIFIER Main
+SYMBOL {
+KEYWORD function
+KEYWORD void
+IDENTIFIER main
+SYMBOL (
+SYMBOL )
+SYMBOL {
+KEYWORD var
+IDENTIFIER Array
+IDENTIFIER a
+SYMBOL ;
+KEYWORD var
+KEYWORD int
+IDENTIFIER length
+SYMBOL ;
+KEYWORD var
+KEYWORD int
+IDENTIFIER i
+SYMBOL ,
+IDENTIFIER sum
+SYMBOL ;
+KEYWORD let
+IDENTIFIER length
+SYMBOL =
+IDENTIFIER Keyboard
+SYMBOL .
+IDENTIFIER readInt
+SYMBOL (
+STRING_CONST HOW MANY NUMBERS? 
+SYMBOL )
+SYMBOL ;
+KEYWORD let
+IDENTIFIER a
+SYMBOL =
+IDENTIFIER Array
+SYMBOL .
+IDENTIFIER new
+SYMBOL (
+IDENTIFIER length
+SYMBOL )
+SYMBOL ;
+KEYWORD let
+IDENTIFIER i
+SYMBOL =
+INT_CONST 0
+SYMBOL ;
+KEYWORD while
+SYMBOL (
+IDENTIFIER i
+SYMBOL <
+IDENTIFIER length
+SYMBOL )
+SYMBOL {
+KEYWORD let
+IDENTIFIER a
+SYMBOL [
+IDENTIFIER i
+SYMBOL ]
+SYMBOL =
+IDENTIFIER Keyboard
+SYMBOL .
+IDENTIFIER readInt
+SYMBOL (
+STRING_CONST ENTER THE NEXT NUMBER: 
+SYMBOL )
+SYMBOL ;
+KEYWORD let
+IDENTIFIER i
+SYMBOL =
+IDENTIFIER i
+SYMBOL +
+INT_CONST 1
+SYMBOL ;
+SYMBOL }
+KEYWORD let
+IDENTIFIER i
+SYMBOL =
+INT_CONST 0
+SYMBOL ;
+KEYWORD let
+IDENTIFIER sum
+SYMBOL =
+INT_CONST 0
+SYMBOL ;
+KEYWORD while
+SYMBOL (
+IDENTIFIER i
+SYMBOL <
+IDENTIFIER length
+SYMBOL )
+SYMBOL {
+KEYWORD let
+IDENTIFIER sum
+SYMBOL =
+IDENTIFIER sum
+SYMBOL +
+IDENTIFIER a
+SYMBOL [
+IDENTIFIER i
+SYMBOL ]
+SYMBOL ;
+KEYWORD let
+IDENTIFIER i
+SYMBOL =
+IDENTIFIER i
+SYMBOL +
+INT_CONST 1
+SYMBOL ;
+SYMBOL }
+KEYWORD do
+IDENTIFIER Output
+SYMBOL .
+IDENTIFIER printString
+SYMBOL (
+STRING_CONST THE AVERAGE IS: 
+SYMBOL )
+SYMBOL ;
+KEYWORD do
+IDENTIFIER Output
+SYMBOL .
+IDENTIFIER printInt
+SYMBOL (
+IDENTIFIER sum
+SYMBOL /
+IDENTIFIER length
+SYMBOL )
+SYMBOL ;
+KEYWORD do
+IDENTIFIER Output
+SYMBOL .
+IDENTIFIER println
+SYMBOL (
+SYMBOL )
+SYMBOL ;
+KEYWORD return
+SYMBOL ;
+SYMBOL }
+SYMBOL }
