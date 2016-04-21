@@ -5,6 +5,7 @@ public class Parser {
 	public static ArrayList<tokenType> typeList = new ArrayList<tokenType>();
 	String token;
 	public int counter = 0;
+	public static SymbolTable table;
 
 	public Parser(ArrayList<String> tokenList, ArrayList<tokenType> typeList) {
 		this.tokenList = tokenList;
@@ -44,12 +45,16 @@ public class Parser {
 					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
 				if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+					table.addToClassMap(tokenList.get(counter));
 					counter++;
 					if (tokenList.get(counter).equals(",")) {
 						counter++;
 						while (tokenList.get(counter).equals(",")
 								|| typeList.get(counter).equals(
 										tokenType.IDENTIFIER)) {
+							if (!tokenList.get(counter).equals(","))
+								table.addToClassMap(tokenList.get(counter));
+							
 							counter++;
 						}
 						if (tokenList.get(counter).equals(";")) {
@@ -67,6 +72,7 @@ public class Parser {
 	}
 
 	public void parseSubroutine() {
+		table.startSub();
 		if (tokenList.get(counter).equals("constructor")) {
 			counter++;
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
@@ -159,6 +165,7 @@ public class Parser {
 			counter++;
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
+				table.addToSubMap(tokenList.get(counter));
 				if (tokenList.get(counter).equals(",")) {
 					counter++;
 					parseParameterList();
@@ -178,12 +185,15 @@ public class Parser {
 					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
 				if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+					table.addToSubMap(tokenList.get(counter));
 					counter++;
 					if (tokenList.get(counter).equals(",")) {
 						counter++;
 						while (tokenList.get(counter).equals(",")
 								|| typeList.get(counter).equals(
 										tokenType.IDENTIFIER)) {
+							if(!tokenList.get(counter).equals(","))
+								table.addToSubMap(tokenList.get(counter));
 							counter++;
 						}
 						if (tokenList.get(counter).equals(";")) {
@@ -398,6 +408,7 @@ public class Parser {
 	}
 
 	public void runner() {
+		table = new SymbolTable();
 		parseClass();
 	}
 }

@@ -1,0 +1,27 @@
+import java.util.HashMap;
+import java.util.Map;
+
+
+public class SymbolTable {
+	
+	Map<String, Integer> classMap;
+	Map<String, Integer> subMap;
+
+	public SymbolTable(){
+		classMap = new HashMap<String, Integer>();
+		subMap = new HashMap<String, Integer>();
+	}
+	
+	public void addToClassMap(String str, int i){
+		classMap.put(str,  i);
+	}
+	
+	public void addToSubMap(String str, int i){
+		subMap.put(str,  i);
+	}
+	
+	public void startSub(){
+		subMap.clear();
+	}
+	
+}

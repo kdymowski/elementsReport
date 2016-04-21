@@ -53,7 +53,7 @@ public class Tokenizer {
 	}
 
 	public static void initScanner() throws FileNotFoundException {
-		Scanner s = new Scanner(new File("Main.jack"));
+		Scanner s = new Scanner(new File("SquareGame.jack"));
 		while (s.hasNext()) {
 			String line = s.next();
 			if (line.equals("//"))
