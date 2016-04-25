@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class Parser {
@@ -7,17 +9,24 @@ public class Parser {
 	public int counter = 0;
 	public static SymbolTable table;
 	public String CLASSNAME;
+	public static PrintStream writer;
 
 	public Parser(ArrayList<String> tokenList, ArrayList<tokenType> typeList) {
 		this.tokenList = tokenList;
 		this.typeList = typeList;
+		try {
+			writer = new PrintStream("out.vm");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void parseClass() {
 		if (tokenList.get(counter).equals("class")) {
 			counter++;
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
-				CLASSNAME = tokenList.get(counter)
+				CLASSNAME = tokenList.get(counter);
 				counter++;
 				if (tokenList.get(counter).equals("{")) {
 					counter++;
@@ -76,6 +85,7 @@ public class Parser {
 
 	public void parseSubroutine() {
 		table.startSub();
+		table.addToSubMap(CLASSNAME, "argument");
 		if (tokenList.get(counter).equals("constructor")) {
 			counter++;
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
@@ -90,8 +100,8 @@ public class Parser {
 						counter++;
 						if (tokenList.get(counter).equals("{")) {
 							counter++;
-							table.subCounter = 0;
 							parseVarDec();
+							writer.println("function " + CLASSNAME + "." + "new " + (table.subCounterVar));
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
 								return;
@@ -109,6 +119,7 @@ public class Parser {
 					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
 				if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+					String methodName = tokenList.get(counter);
 					counter++;
 					if (tokenList.get(counter).equals("(")) {
 						counter++;
@@ -118,8 +129,8 @@ public class Parser {
 						counter++;
 						if (tokenList.get(counter).equals("{")) {
 							counter++;
-							table.subCounter = 0;
 							parseVarDec();
+							writer.println("function " + CLASSNAME + "." + methodName + " " + (table.subCounterVar));
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
 								return;
@@ -137,6 +148,7 @@ public class Parser {
 					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
 				if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+					String methodName = tokenList.get(counter);
 					counter++;
 					if (tokenList.get(counter).equals("(")) {
 						counter++;
@@ -146,8 +158,8 @@ public class Parser {
 						counter++;
 						if (tokenList.get(counter).equals("{")) {
 							counter++;
-							table.subCounter = 0;
 							parseVarDec(); // !
+							writer.println("function " + CLASSNAME + "." + methodName + " " + (table.subCounterVar));
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
 								return;
@@ -172,7 +184,7 @@ public class Parser {
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
 				
-				table.addToSubMap(tokenList.get(counter));
+				table.addToSubMap(tokenList.get(counter), "argument");
 				if (tokenList.get(counter).equals(",")) {
 					counter++;
 					parseParameterList();
@@ -193,7 +205,7 @@ public class Parser {
 					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
 				if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
-					table.addToSubMap(tokenList.get(counter));
+					table.addToSubMap(tokenList.get(counter), "var");
 					counter++;
 					if (tokenList.get(counter).equals(",")) {
 						counter++;
@@ -201,7 +213,7 @@ public class Parser {
 								|| typeList.get(counter).equals(
 										tokenType.IDENTIFIER)) {
 							if(!tokenList.get(counter).equals(","))
-								table.addToSubMap(tokenList.get(counter));
+								table.addToSubMap(tokenList.get(counter), "var");
 							counter++;
 						}
 						if (tokenList.get(counter).equals(";")) {
@@ -252,7 +264,8 @@ public class Parser {
 	}
 
 	public void parseDo() {
-		parseExpression();
+		subroutineCall();
+		writer.println("pop temp 0");
 		return;
 		/*
 		 * if (typeList.get(counter).equals(tokenType.IDENTIFIER)) { counter++;
@@ -404,19 +417,53 @@ public class Parser {
 		System.exit(-1);
 	}
 
-	public void parseExpressionList() {
+	public int parseExpressionList() {
+		int nExp = 0;
 		while (!tokenList.get(counter).equals(")")) {
+			nExp++;
 			parseExpression();
 			counter++;
 			if (tokenList.get(counter).equals(",")) {
 				counter++;
 			}
 		}
-		return;
+		return nExp;
 	}
 
 	public void runner() {
 		table = new SymbolTable();
 		parseClass();
+		writer.close();
+	}
+	
+	public void subroutineCall() {
+		if (tokenList.get(counter + 1).equals("(")) {
+			String subroutineName = tokenList.get(counter);
+			writer.println("push pointer 0");
+			counter++;
+			counter++;
+			int numberOfExpressions = parseExpressionList();
+			writer.println("call " + CLASSNAME + "." + subroutineName + " " + numberOfExpressions);
+		} else if (tokenList.get(counter + 1).equals(".")) {
+			if (table.subMap.get(tokenList.get(counter)).index == 0) {
+				counter++;
+				counter++;
+				String subroutineName = tokenList.get(counter);
+				counter++;
+				counter++;
+				int numberOfExpressions = parseExpressionList();
+				writer.println("call " + CLASSNAME + "." + subroutineName + " " + numberOfExpressions);
+			} else {
+				String varName = tokenList.get(counter);
+				writer.println("push " + table.subMap.get(tokenList.get(counter)).kind + table.subMap.get(tokenList.get(counter)).index);
+				counter++;
+				counter++;
+				String subroutineName = tokenList.get(counter);
+				counter++;
+				counter++;
+				int numberOfExpressions = parseExpressionList();
+				writer.println("call " + varName + "." + subroutineName + " " + numberOfExpressions);
+			}
+		}
 	}
 }
