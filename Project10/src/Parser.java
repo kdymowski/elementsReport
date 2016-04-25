@@ -6,6 +6,7 @@ public class Parser {
 	String token;
 	public int counter = 0;
 	public static SymbolTable table;
+	public String CLASSNAME;
 
 	public Parser(ArrayList<String> tokenList, ArrayList<tokenType> typeList) {
 		this.tokenList = tokenList;
@@ -16,6 +17,7 @@ public class Parser {
 		if (tokenList.get(counter).equals("class")) {
 			counter++;
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
+				CLASSNAME = tokenList.get(counter)
 				counter++;
 				if (tokenList.get(counter).equals("{")) {
 					counter++;
@@ -38,6 +40,7 @@ public class Parser {
 	public void parseClassVarDec() {
 		while (tokenList.get(counter).equals("field")
 				|| tokenList.get(counter).equals("static")) {
+			String type = tokenList.get(counter);
 			counter++;
 			if (tokenList.get(counter).equals("int")
 					|| tokenList.get(counter).equals("char")
@@ -45,7 +48,7 @@ public class Parser {
 					|| typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
 				if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
-					table.addToClassMap(tokenList.get(counter));
+					table.addToClassMap(tokenList.get(counter), type);
 					counter++;
 					if (tokenList.get(counter).equals(",")) {
 						counter++;
@@ -53,7 +56,7 @@ public class Parser {
 								|| typeList.get(counter).equals(
 										tokenType.IDENTIFIER)) {
 							if (!tokenList.get(counter).equals(","))
-								table.addToClassMap(tokenList.get(counter));
+								table.addToClassMap(tokenList.get(counter), type);
 							
 							counter++;
 						}
@@ -87,6 +90,7 @@ public class Parser {
 						counter++;
 						if (tokenList.get(counter).equals("{")) {
 							counter++;
+							table.subCounter = 0;
 							parseVarDec();
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
@@ -114,6 +118,7 @@ public class Parser {
 						counter++;
 						if (tokenList.get(counter).equals("{")) {
 							counter++;
+							table.subCounter = 0;
 							parseVarDec();
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
@@ -141,6 +146,7 @@ public class Parser {
 						counter++;
 						if (tokenList.get(counter).equals("{")) {
 							counter++;
+							table.subCounter = 0;
 							parseVarDec(); // !
 							parseStatements();
 							if (tokenList.get(counter).equals("}")) {
@@ -165,6 +171,7 @@ public class Parser {
 			counter++;
 			if (typeList.get(counter).equals(tokenType.IDENTIFIER)) {
 				counter++;
+				
 				table.addToSubMap(tokenList.get(counter));
 				if (tokenList.get(counter).equals(",")) {
 					counter++;
@@ -177,6 +184,7 @@ public class Parser {
 	}
 
 	public void parseVarDec() {
+		
 		if (tokenList.get(counter).equals("var")) {
 			counter++;
 			if (tokenList.get(counter).equals("int")
