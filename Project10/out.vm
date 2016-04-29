@@ -1,0 +1,24 @@
+function Main.main 2
+push constant 8001
+push constant 16
+push constant 1
+neg
+push constant 8000
+push constant 1
+push constant 9000
+push constant 16
+add
+add
+call Main.fillMemory 18
+pop temp 0
+push constant 0
+push constant 8000
+push constant 1
+push constant 8000
+push constant 0
+push constant 0
+push constant 1
+push constant 2
+push constant 0
+push constant 1
+push constant 1

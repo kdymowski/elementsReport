@@ -14,22 +14,22 @@ public class SymbolTable {
 		subMap = new HashMap<String, Symbol>();
 	}
 
-	public void addToClassMap(String str, String type) {
+	public void addToClassMap(String str, String kind, String type) {
 		if (type.equals("static")) {
-			classMap.put(str, new Symbol(classCounterStatic, type));
+			classMap.put(str, new Symbol(classCounterStatic, kind, type));
 			classCounterStatic++;
 		} else {
-			classMap.put(str, new Symbol(classCounterField, type));
+			classMap.put(str, new Symbol(classCounterField, kind, type));
 			classCounterField++;
 		}
 	}
 
-	public void addToSubMap(String str, String type) {
+	public void addToSubMap(String str, String kind, String type) {
 		if (type.equals("argument")) {
-			subMap.put(str, new Symbol(subCounterArg, type));
+			subMap.put(str, new Symbol(subCounterArg, kind, type));
 			subCounterArg++;
 		} else {
-			subMap.put(str, new Symbol(subCounterVar, type));
+			subMap.put(str, new Symbol(subCounterVar, kind, type));
 			subCounterVar++;
 		}
 	}
@@ -53,10 +53,12 @@ public class SymbolTable {
 class Symbol {
 	public int index;
 	public String kind;
+	public String type;
 	
-	public Symbol (int index, String kind) {
+	public Symbol (int index, String kind, String type) {
 		super();
 		this.index = index;
 		this.kind = kind;
+		this.type = type;
 	}
 }
