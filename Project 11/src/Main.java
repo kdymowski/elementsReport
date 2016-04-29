@@ -15,13 +15,10 @@ public class Main {
 		for (File f : files) {
 
 			if (f.getName().endsWith(".jack")) {
-
 				result.add(f);
-
 			}
 
 		}
-
 		return result;
 
 	}
@@ -55,9 +52,7 @@ public class Main {
 			jackFiles = getJackFiles(fileIn);
 
 			if (jackFiles.size() == 0) {
-
 				throw new IllegalArgumentException("No .jack file found");
-
 			}
 
 		}
@@ -70,7 +65,7 @@ public class Main {
 			fileOut = new File(fileOutPath);
 
 			Parser compilationEngine = new Parser(f, fileOut);
-			compilationEngine.compileClass();
+			compilationEngine.parseClass();
 
 		}
 

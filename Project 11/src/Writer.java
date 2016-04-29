@@ -7,12 +7,12 @@ public class Writer {
 
 	private static HashMap<Command, String> commands = new HashMap<Command, String>();
 	private static HashMap<Segment, String> segments = new HashMap<Segment, String>();
-	private PrintWriter printWriter;
+	private PrintWriter pWriter;
 
 	public Writer(File fOut) {
 
 		try {
-			printWriter = new PrintWriter(fOut);
+			pWriter = new PrintWriter(fOut);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -35,6 +35,10 @@ public class Writer {
 		commands.put(Command.OR, "or");
 		commands.put(Command.NOT, "not");
 	}
+	
+	public void close() {
+		pWriter.close();
+	}
 
 	public void writePush(Segment segment, int index) {
 		writeCommand("push", segments.get(segment), String.valueOf(index));
@@ -48,6 +52,14 @@ public class Writer {
 		writeCommand(commands.get(command), "", "");
 	}
 
+	public void writeFunction(String name, int nLocals) {
+		writeCommand("function", name, String.valueOf(nLocals));
+	}
+
+	public void writeReturn() {
+		writeCommand("return", "", "");
+	}
+	
 	public void writeLabel(String label) {
 		writeCommand("label", label, "");
 	}
@@ -59,27 +71,15 @@ public class Writer {
 	public void writeIf(String label) {
 		writeCommand("if-goto", label, "");
 	}
-
+	
 	public void writeCall(String name, int nArgs) {
 		writeCommand("call", name, String.valueOf(nArgs));
 	}
 
-	public void writeFunction(String name, int nLocals) {
-		writeCommand("function", name, String.valueOf(nLocals));
-	}
-
-	public void writeReturn() {
-		writeCommand("return", "", "");
-	}
-
 	public void writeCommand(String cmd, String arg1, String arg2) {
 
-		printWriter.print(cmd + " " + arg1 + " " + arg2 + "\n");
+		pWriter.print(cmd + " " + arg1 + " " + arg2 + "\n");
 
-	}
-
-	public void close() {
-		printWriter.close();
 	}
 
 }

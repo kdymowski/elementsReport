@@ -11,7 +11,7 @@ public class Tokenizer {
 
 	private String currentToken;
 	private TokenType currentTokenType;
-	private int pointer;
+	private int counter;
 	private ArrayList<String> tokens;
 
 	private static Pattern tokenPatterns;
@@ -79,7 +79,7 @@ public class Tokenizer {
 
 			Matcher m = tokenPatterns.matcher(preprocessed);
 			tokens = new ArrayList<String>();
-			pointer = 0;
+			counter = 0;
 
 			while (m.find()) {
 
@@ -118,14 +118,14 @@ public class Tokenizer {
 	}
 
 	public boolean hasMoreTokens() {
-		return pointer < tokens.size();
+		return counter < tokens.size();
 	}
 
 	public void advance() {
 
 		if (hasMoreTokens()) {
-			currentToken = tokens.get(pointer);
-			pointer++;
+			currentToken = tokens.get(counter);
+			counter++;
 		} else {
 			throw new IllegalStateException("No more tokens");
 		}
@@ -217,9 +217,9 @@ public class Tokenizer {
 
 	public void pointerBack() {
 
-		if (pointer > 0) {
-			pointer--;
-			currentToken = tokens.get(pointer);
+		if (counter > 0) {
+			counter--;
+			currentToken = tokens.get(counter);
 		}
 
 	}

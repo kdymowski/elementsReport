@@ -19,13 +19,13 @@ public class SymbolTable {
 
 	}
 
-	public void startSubroutine() {
+	public void clearSubroutine() {
 		subMap.clear();
 		indexMap.put(Kind.VAR, 0);
 		indexMap.put(Kind.ARG, 0);
 	}
 
-	public void define(String name, String type, Kind kind) {
+	public void addToMap(String name, String type, Kind kind) {
 
 		if (kind == Kind.ARG || kind == Kind.VAR) {
 
@@ -45,13 +45,13 @@ public class SymbolTable {
 
 	}
 
-	public int varCount(Kind kind) {
+	public int getVarCount(Kind kind) {
 		return indexMap.get(kind);
 	}
 
 	public Kind kindOf(String name) {
 
-		Symbol symbol = lookUp(name);
+		Symbol symbol = getSymbol(name);
 
 		if (symbol != null)
 			return symbol.kind;
@@ -61,7 +61,7 @@ public class SymbolTable {
 
 	public String typeOf(String name) {
 
-		Symbol symbol = lookUp(name);
+		Symbol symbol = getSymbol(name);
 
 		if (symbol != null)
 			return symbol.type;
@@ -71,7 +71,7 @@ public class SymbolTable {
 
 	public int indexOf(String name) {
 
-		Symbol symbol = lookUp(name);
+		Symbol symbol = getSymbol(name);
 
 		if (symbol != null)
 			return symbol.index;
@@ -79,7 +79,7 @@ public class SymbolTable {
 		return -1;
 	}
 
-	private Symbol lookUp(String name) {
+	private Symbol getSymbol(String name) {
 
 		if (classMap.get(name) != null) {
 			return classMap.get(name);

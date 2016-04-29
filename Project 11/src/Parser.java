@@ -31,7 +31,7 @@ public class Parser {
 		return "";
 	}
 
-	private String compileType() {
+	private String parseType() {
 
 		tokenizer.advance();
 
@@ -51,7 +51,7 @@ public class Parser {
 		return "";
 	}
 
-	public void compileClass() {
+	public void parseClass() {
 
 		tokenizer.advance();
 
@@ -71,8 +71,8 @@ public class Parser {
 
 		requireSymbol('{');
 
-		compileClassVarDec();
-		compileSubroutine();
+		parseClassVarDec();
+		parseSubroutine();
 
 		requireSymbol('}');
 
@@ -84,7 +84,7 @@ public class Parser {
 
 	}
 
-	private void compileClassVarDec() {
+	private void parseClassVarDec() {
 
 		tokenizer.advance();
 
@@ -120,7 +120,7 @@ public class Parser {
 			kind = Kind.FIELD;
 		}
 
-		type = compileType();
+		type = parseType();
 
 		boolean varNamesDone = false;
 
@@ -133,7 +133,7 @@ public class Parser {
 
 			name = tokenizer.identifier();
 
-			symbolTable.define(name, type, kind);
+			symbolTable.addToMap(name, type, kind);
 
 			tokenizer.advance();
 
@@ -148,10 +148,10 @@ public class Parser {
 
 		}
 
-		compileClassVarDec();
+		parseClassVarDec();
 	}
 
-	private void compileSubroutine() {
+	private void parseSubroutine() {
 
 		tokenizer.advance();
 
@@ -170,10 +170,10 @@ public class Parser {
 
 		Keyword keyword = tokenizer.keyWord();
 
-		symbolTable.startSubroutine();
+		symbolTable.clearSubroutine();
 
 		if (tokenizer.keyWord() == Keyword.METHOD) {
-			symbolTable.define("this", currentClass, Kind.ARG);
+			symbolTable.addToMap("this", currentClass, Kind.ARG);
 		}
 
 		String type = "";
@@ -184,7 +184,7 @@ public class Parser {
 			type = "void";
 		} else {
 			tokenizer.pointerBack();
-			type = compileType();
+			type = parseType();
 		}
 
 		tokenizer.advance();
@@ -196,32 +196,32 @@ public class Parser {
 
 		requireSymbol('(');
 
-		compileParameterList();
+		parseParameterList();
 
 		requireSymbol(')');
 
-		compileSubroutineBody(keyword);
+		parseSubroutineBody(keyword);
 
-		compileSubroutine();
+		parseSubroutine();
 
 	}
 
-	private void compileSubroutineBody(Keyword keyword) {
+	private void parseSubroutineBody(Keyword keyword) {
 
 		requireSymbol('{');
 
-		compileVarDec();
+		parseVarDec();
 
 		wrtieFunctionDec(keyword);
 
-		compileStatement();
+		parseStatement();
 
 		requireSymbol('}');
 	}
 
 	private void wrtieFunctionDec(Keyword keyword) {
 
-		writer.writeFunction(currentFunction(), symbolTable.varCount(Kind.VAR));
+		writer.writeFunction(currentFunction(), symbolTable.getVarCount(Kind.VAR));
 
 		if (keyword == Keyword.METHOD) {
 
@@ -230,13 +230,13 @@ public class Parser {
 
 		} else if (keyword == Keyword.CONSTRUCTOR) {
 
-			writer.writePush(Segment.CONST, symbolTable.varCount(Kind.FIELD));
+			writer.writePush(Segment.CONST, symbolTable.getVarCount(Kind.FIELD));
 			writer.writeCall("Memory.alloc", 1);
 			writer.writePop(Segment.POINTER, 0);
 		}
 	}
 
-	private void compileStatement() {
+	private void parseStatement() {
 
 		tokenizer.advance();
 
@@ -250,24 +250,24 @@ public class Parser {
 			System.exit(-1);
 		} else {
 			if (tokenizer.keyWord() == Keyword.DO) {
-				compileDo();
+				parseDo();
 			} else if (tokenizer.keyWord() == Keyword.LET) {
-				compileLet();
+				parseLet();
 			} else if (tokenizer.keyWord() == Keyword.WHILE) {
-				compileWhile();
+				parseWhile();
 			} else if (tokenizer.keyWord() == Keyword.RETURN) {
-				compileReturn();
+				parseReturn();
 			} else if (tokenizer.keyWord() == Keyword.IF) {
-				compileIf();
+				parseIf();
 			} else {
 				System.exit(-1);
 			}
 		}
 
-		compileStatement();
+		parseStatement();
 	}
 
-	private void compileParameterList() {
+	private void parseParameterList() {
 
 		tokenizer.advance();
 		if (tokenizer.tokenType() == TokenType.SYMBOL
@@ -281,14 +281,14 @@ public class Parser {
 		tokenizer.pointerBack();
 		while (true) {
 
-			type = compileType();
+			type = parseType();
 
 			tokenizer.advance();
 			if (tokenizer.tokenType() != TokenType.IDENTIFIER) {
 				System.exit(-1);
 			}
 
-			symbolTable.define(tokenizer.identifier(), type, Kind.ARG);
+			symbolTable.addToMap(tokenizer.identifier(), type, Kind.ARG);
 
 			tokenizer.advance();
 			if (tokenizer.tokenType() != TokenType.SYMBOL
@@ -305,7 +305,7 @@ public class Parser {
 
 	}
 
-	private void compileVarDec() {
+	private void parseVarDec() {
 
 		tokenizer.advance();
 
@@ -315,7 +315,7 @@ public class Parser {
 			return;
 		}
 
-		String type = compileType();
+		String type = parseType();
 
 		while (true) {
 
@@ -325,7 +325,7 @@ public class Parser {
 				System.exit(-1);
 			}
 
-			symbolTable.define(tokenizer.identifier(), type, Kind.VAR);
+			symbolTable.addToMap(tokenizer.identifier(), type, Kind.VAR);
 
 			tokenizer.advance();
 
@@ -340,20 +340,20 @@ public class Parser {
 
 		}
 
-		compileVarDec();
+		parseVarDec();
 
 	}
 
-	private void compileDo() {
+	private void parseDo() {
 
-		compileSubroutineCall();
+		parseSubroutineCall();
 
 		requireSymbol(';');
 
 		writer.writePop(Segment.TEMP, 0);
 	}
 
-	private void compileLet() {
+	private void parseLet() {
 
 		tokenizer.advance();
 		if (tokenizer.tokenType() != TokenType.IDENTIFIER) {
@@ -377,7 +377,7 @@ public class Parser {
 			writer.writePush(getSeg(symbolTable.kindOf(varName)),
 					symbolTable.indexOf(varName));
 
-			compileExpression();
+			parseExpression();
 
 			requireSymbol(']');
 
@@ -387,7 +387,7 @@ public class Parser {
 		if (expExist)
 			tokenizer.advance();
 
-		compileExpression();
+		parseExpression();
 
 		requireSymbol(';');
 
@@ -421,7 +421,7 @@ public class Parser {
 		}
 	}
 
-	private void compileWhile() {
+	private void parseWhile() {
 
 		String continueLabel = newLabel();
 		String topLabel = newLabel();
@@ -430,7 +430,7 @@ public class Parser {
 
 		requireSymbol('(');
 
-		compileExpression();
+		parseExpression();
 
 		requireSymbol(')');
 
@@ -439,7 +439,7 @@ public class Parser {
 
 		requireSymbol('{');
 
-		compileStatement();
+		parseStatement();
 
 		requireSymbol('}');
 
@@ -452,7 +452,7 @@ public class Parser {
 		return "LABEL_" + (labelIndex++);
 	}
 
-	private void compileReturn() {
+	private void parseReturn() {
 
 		tokenizer.advance();
 
@@ -464,7 +464,7 @@ public class Parser {
 
 			tokenizer.pointerBack();
 
-			compileExpression();
+			parseExpression();
 
 			requireSymbol(';');
 		}
@@ -473,14 +473,14 @@ public class Parser {
 
 	}
 
-	private void compileIf() {
+	private void parseIf() {
 
 		String elseLabel = newLabel();
 		String endLabel = newLabel();
 
 		requireSymbol('(');
 
-		compileExpression();
+		parseExpression();
 
 		requireSymbol(')');
 
@@ -489,7 +489,7 @@ public class Parser {
 
 		requireSymbol('{');
 
-		compileStatement();
+		parseStatement();
 
 		requireSymbol('}');
 
@@ -503,7 +503,7 @@ public class Parser {
 
 			requireSymbol('{');
 
-			compileStatement();
+			parseStatement();
 
 			requireSymbol('}');
 		} else {
@@ -514,7 +514,7 @@ public class Parser {
 
 	}
 
-	private void compileTerm() {
+	private void parseTerm() {
 
 		tokenizer.advance();
 
@@ -529,7 +529,7 @@ public class Parser {
 				writer.writePush(getSeg(symbolTable.kindOf(tempId)),
 						symbolTable.indexOf(tempId));
 
-				compileExpression();
+				parseExpression();
 
 				requireSymbol(']');
 
@@ -544,7 +544,7 @@ public class Parser {
 
 				tokenizer.pointerBack();
 				tokenizer.pointerBack();
-				compileSubroutineCall();
+				parseSubroutineCall();
 			} else {
 
 				tokenizer.pointerBack();
@@ -589,7 +589,7 @@ public class Parser {
 			} else if (tokenizer.tokenType() == TokenType.SYMBOL
 					&& tokenizer.symbol() == '(') {
 
-				compileExpression();
+				parseExpression();
 
 				requireSymbol(')');
 			} else if (tokenizer.tokenType() == TokenType.SYMBOL
@@ -597,7 +597,7 @@ public class Parser {
 
 				char s = tokenizer.symbol();
 
-				compileTerm();
+				parseTerm();
 
 				if (s == '-') {
 					writer.writeArithmetic(Command.NEG);
@@ -612,7 +612,7 @@ public class Parser {
 
 	}
 
-	private void compileSubroutineCall() {
+	private void parseSubroutineCall() {
 
 		tokenizer.advance();
 		if (tokenizer.tokenType() != TokenType.IDENTIFIER) {
@@ -628,7 +628,7 @@ public class Parser {
 
 			writer.writePush(Segment.POINTER, 0);
 
-			nArgs = compileExpressionList() + 1;
+			nArgs = parseExpressionList() + 1;
 
 			requireSymbol(')');
 
@@ -664,7 +664,7 @@ public class Parser {
 
 			requireSymbol('(');
 
-			nArgs += compileExpressionList();
+			nArgs += parseExpressionList();
 
 			requireSymbol(')');
 
@@ -675,9 +675,9 @@ public class Parser {
 
 	}
 
-	private void compileExpression() {
+	private void parseExpression() {
 
-		compileTerm();
+		parseTerm();
 
 		while (true) {
 			tokenizer.advance();
@@ -708,7 +708,7 @@ public class Parser {
 					System.exit(-1);
 				}
 
-				compileTerm();
+				parseTerm();
 
 				writer.writeCommand(opCmd, "", "");
 
@@ -721,7 +721,7 @@ public class Parser {
 
 	}
 
-	private int compileExpressionList() {
+	private int parseExpressionList() {
 		int nArgs = 0;
 
 		tokenizer.advance();
@@ -733,14 +733,14 @@ public class Parser {
 			nArgs = 1;
 			tokenizer.pointerBack();
 
-			compileExpression();
+			parseExpression();
 
 			while (true) {
 				tokenizer.advance();
 				if (tokenizer.tokenType() == TokenType.SYMBOL
 						&& tokenizer.symbol() == ',') {
 
-					compileExpression();
+					parseExpression();
 					nArgs++;
 				} else {
 					tokenizer.pointerBack();
