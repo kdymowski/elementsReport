@@ -1,9 +1,13 @@
 import java.io.File;
 import java.util.ArrayList;
 
+/*
+ * reads in files either directory or file 
+ */
+
 public class Main {
 
-	public static ArrayList<File> getJackFiles(File dir) {
+	public static ArrayList<File> getFiles(File dir) {
 
 		File[] files = dir.listFiles();
 
@@ -30,9 +34,9 @@ public class Main {
 
 		String fileOutPath = "";
 
-		File fileOut;
+		File out;
 
-		ArrayList<File> jackFiles = new ArrayList<File>();
+		ArrayList<File> files = new ArrayList<File>();
 
 		if (fileIn.isFile()) {
 
@@ -45,26 +49,26 @@ public class Main {
 
 			}
 
-			jackFiles.add(fileIn);
+			files.add(fileIn);
 
 		} else if (fileIn.isDirectory()) {
 
-			jackFiles = getJackFiles(fileIn);
+			files = getFiles(fileIn);
 
-			if (jackFiles.size() == 0) {
+			if (files.size() == 0) {
 				throw new IllegalArgumentException("No .jack file found");
 			}
 
 		}
 
-		for (File f : jackFiles) {
+		for (File f : files) {
 
 			fileOutPath = f.getAbsolutePath().substring(0,
 					f.getAbsolutePath().lastIndexOf("."))
 					+ ".vm";
-			fileOut = new File(fileOutPath);
+			out = new File(fileOutPath);
 
-			Parser compilationEngine = new Parser(f, fileOut);
+			Parser compilationEngine = new Parser(f, out);
 			compilationEngine.parseClass();
 
 		}

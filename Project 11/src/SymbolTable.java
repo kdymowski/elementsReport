@@ -18,12 +18,16 @@ public class SymbolTable {
 		indexMap.put(Kind.VAR, 0);
 
 	}
+	
+	//clear subroutine at the beginning
 
 	public void clearSubroutine() {
 		subMap.clear();
 		indexMap.put(Kind.VAR, 0);
 		indexMap.put(Kind.ARG, 0);
 	}
+	
+	//function to add to map, either sub or class
 
 	public void addToMap(String name, String type, Kind kind) {
 
@@ -44,11 +48,15 @@ public class SymbolTable {
 		}
 
 	}
+	
+	//get the var count from associated kind 
 
 	public int getVarCount(Kind kind) {
 		return indexMap.get(kind);
 	}
-
+	
+	//returns the find of symbol
+	
 	public Kind kindOf(String name) {
 
 		Symbol symbol = getSymbol(name);
@@ -59,6 +67,8 @@ public class SymbolTable {
 		return Kind.NONE;
 	}
 
+	// returns the type of symbol
+	
 	public String typeOf(String name) {
 
 		Symbol symbol = getSymbol(name);
@@ -68,6 +78,8 @@ public class SymbolTable {
 
 		return "";
 	}
+	
+	// returns the index of symbol
 
 	public int indexOf(String name) {
 
@@ -78,6 +90,8 @@ public class SymbolTable {
 
 		return -1;
 	}
+	
+	// returns the symbol
 
 	private Symbol getSymbol(String name) {
 
@@ -90,6 +104,8 @@ public class SymbolTable {
 		}
 	}
 }
+
+// storage for the symbol
 
 class Symbol {
 

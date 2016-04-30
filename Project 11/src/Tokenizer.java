@@ -25,6 +25,7 @@ public class Tokenizer {
 	private static HashSet<Character> opSet = new HashSet<Character>();
 
 	public Tokenizer(File inFile) {
+	
 
 		keyWordMap.put("class", Keyword.CLASS);
 		keyWordMap.put("constructor", Keyword.CONSTRUCTOR);
@@ -66,14 +67,14 @@ public class Tokenizer {
 
 			while (scanner.hasNext()) {
 
-				line = noComments(scanner.nextLine()).trim();
+				line = removeComments(scanner.nextLine()).trim();
 
 				if (line.length() > 0) {
 					preprocessed += line + "\n";
 				}
 			}
 
-			preprocessed = noBlockComments(preprocessed).trim();
+			preprocessed = removeCommentBlocks(preprocessed).trim();
 
 			initRegs();
 
@@ -97,6 +98,8 @@ public class Tokenizer {
 		currentTokenType = TokenType.NONE;
 
 	}
+	
+	//initializes the regular expressions used to strip the code
 
 	private void initRegs() {
 
@@ -116,6 +119,7 @@ public class Tokenizer {
 		tokenPatterns = Pattern.compile(idReg + "|" + keyWordReg + symbolReg
 				+ "|" + intReg + "|" + strReg);
 	}
+	
 
 	public boolean hasMoreTokens() {
 		return counter < tokens.size();
@@ -141,12 +145,11 @@ public class Tokenizer {
 		} else if (currentToken.matches(idReg)) {
 			currentTokenType = TokenType.IDENTIFIER;
 		} else {
-
-			throw new IllegalArgumentException("Unknown token:" + currentToken);
+			System.exit(-1);
 		}
 
 	}
-
+	
 	public String getCurrentToken() {
 		return currentToken;
 	}
@@ -164,7 +167,7 @@ public class Tokenizer {
 
 		} else {
 
-			throw new IllegalStateException("Current token is not a keyword!");
+			throw new IllegalStateException("not a keyword");
 		}
 	}
 
@@ -175,7 +178,7 @@ public class Tokenizer {
 			return currentToken.charAt(0);
 
 		} else {
-			throw new IllegalStateException("Current token is not a symbol!");
+			throw new IllegalStateException("not a symbol");
 		}
 	}
 
@@ -186,9 +189,7 @@ public class Tokenizer {
 			return currentToken;
 
 		} else {
-			throw new IllegalStateException(
-					"Current token is not an identifier! current type:"
-							+ currentTokenType);
+			throw new IllegalStateException("not an identifier");
 		}
 	}
 
@@ -199,7 +200,7 @@ public class Tokenizer {
 			return Integer.parseInt(currentToken);
 		} else {
 			throw new IllegalStateException(
-					"Current token is not an integer constant!");
+					"not an integer constant");
 		}
 	}
 
@@ -211,7 +212,7 @@ public class Tokenizer {
 
 		} else {
 			throw new IllegalStateException(
-					"Current token is not a string constant!");
+					"not a string constant");
 		}
 	}
 
@@ -228,7 +229,7 @@ public class Tokenizer {
 		return opSet.contains(symbol());
 	}
 
-	public static String noComments(String strIn) {
+	public static String removeComments(String strIn) {
 
 		int position = strIn.indexOf("//");
 
@@ -241,7 +242,7 @@ public class Tokenizer {
 		return strIn;
 	}
 
-	public static String noSpaces(String strIn) {
+	public static String removeSpaces(String strIn) {
 		String result = "";
 
 		if (strIn.length() != 0) {
@@ -256,7 +257,7 @@ public class Tokenizer {
 		return result;
 	}
 
-	public static String noBlockComments(String strIn) {
+	public static String removeCommentBlocks(String strIn) {
 
 		int startIndex = strIn.indexOf("/*");
 

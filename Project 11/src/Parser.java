@@ -19,18 +19,19 @@ public class Parser {
 		labelIndex = 0;
 
 	}
-
+	
+	//returns the current function with the subroutine
+	
 	private String currentFunction() {
 
 		if (currentClass.length() != 0 && currentSubroutine.length() != 0) {
-
 			return currentClass + "." + currentSubroutine;
-
 		}
 
 		return "";
 	}
-
+		
+	
 	private String parseType() {
 
 		tokenizer.advance();
@@ -212,14 +213,14 @@ public class Parser {
 
 		parseVarDec();
 
-		wrtieFunctionDec(keyword);
+		writeFunctionDec(keyword);
 
 		parseStatement();
 
 		requireSymbol('}');
 	}
 
-	private void wrtieFunctionDec(Keyword keyword) {
+	private void writeFunctionDec(Keyword keyword) {
 
 		writer.writeFunction(currentFunction(), symbolTable.getVarCount(Kind.VAR));
 
@@ -423,8 +424,8 @@ public class Parser {
 
 	private void parseWhile() {
 
-		String continueLabel = newLabel();
-		String topLabel = newLabel();
+		String continueLabel = createNewLabel();
+		String topLabel = createNewLabel();
 
 		writer.writeLabel(topLabel);
 
@@ -448,7 +449,7 @@ public class Parser {
 		writer.writeLabel(continueLabel);
 	}
 
-	private String newLabel() {
+	private String createNewLabel() {
 		return "LABEL_" + (labelIndex++);
 	}
 
@@ -475,8 +476,8 @@ public class Parser {
 
 	private void parseIf() {
 
-		String elseLabel = newLabel();
-		String endLabel = newLabel();
+		String elseLabel = createNewLabel();
+		String endLabel = createNewLabel();
 
 		requireSymbol('(');
 
