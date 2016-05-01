@@ -3,6 +3,13 @@ import java.util.Map;
 
 public class SymbolTable {
 
+	/* classMap stores values for static and field variables
+	 * 
+	 * subMap stores values for var and argument variables
+	 * 
+	 * indexMap keeps track of the indices for both class and subroutine symbol tables
+	 */
+	
 	private HashMap<String, Symbol> classMap;
 	private HashMap<String, Symbol> subMap;
 	private HashMap<Kind, Integer> indexMap;
@@ -19,7 +26,7 @@ public class SymbolTable {
 
 	}
 	
-	//clear subroutine at the beginning
+	//clear subroutine at the beginning, reset indices
 
 	public void clearSubroutine() {
 		subMap.clear();
@@ -46,7 +53,6 @@ public class SymbolTable {
 			classMap.put(name, symbol);
 
 		}
-
 	}
 	
 	//get the var count from associated kind 
@@ -55,7 +61,7 @@ public class SymbolTable {
 		return indexMap.get(kind);
 	}
 	
-	//returns the find of symbol
+	//returns the kind of symbol
 	
 	public Kind kindOf(String name) {
 
@@ -105,7 +111,10 @@ public class SymbolTable {
 	}
 }
 
-// storage for the symbol
+/*
+ * The Symbol class is a convenient way to store all information
+ * relevant to each symbol in the table: type, kind, and index.
+ */
 
 class Symbol {
 

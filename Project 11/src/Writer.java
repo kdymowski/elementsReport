@@ -1,18 +1,25 @@
+import java.util.HashMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 
 public class Writer {
 
+	/* commands stores the appropriate syntax for each VM code command
+	 * 
+	 * segments stores the appropriate syntax for each VM code segment
+	 */
+	
 	private static HashMap<Command, String> commands = new HashMap<Command, String>();
 	private static HashMap<Segment, String> segments = new HashMap<Segment, String>();
 	private PrintWriter pWriter;
 
-	public Writer(File fOut) {
+	public Writer(File f) {
 
+		//Initializes the file to be written as well as the segment and command maps
+		
 		try {
-			pWriter = new PrintWriter(fOut);
+			pWriter = new PrintWriter(f);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -40,6 +47,10 @@ public class Writer {
 		pWriter.close();
 	}
 
+	/* The following methods are used to translate tokens into VM code,
+	 * each method being used for a different command.
+	 */
+	
 	public void writePush(Segment segment, int index) {
 		writeCommand("push", segments.get(segment), String.valueOf(index));
 	}
@@ -77,9 +88,6 @@ public class Writer {
 	}
 
 	public void writeCommand(String cmd, String arg1, String arg2) {
-
 		pWriter.print(cmd + " " + arg1 + " " + arg2 + "\n");
-
 	}
-
 }
